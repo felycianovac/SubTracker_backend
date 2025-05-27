@@ -1,4 +1,4 @@
-package Subscription;
+package com.subtracker.api.Subscription;
 
 public enum Currency {
     USD,
