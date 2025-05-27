@@ -122,5 +122,22 @@ public class AuthenticationService {
                 .build();
     }
 
+    public AuthResponse revertContext(Users currentUser, HttpServletResponse response) {
+        Users ownerUser = Users.builder()
+                .userId(currentUser.getUserId())
+                .email(currentUser.getEmail())
+                .role(Role.OWNER)
+                .build();
+
+        String jwt = jwtService.generateToken(ownerUser);
+        setJwtTokenInCookie(response, jwt);
+
+        return AuthResponse.builder()
+                .message("Returned to OWNER context")
+                .user(UserDTO.fromEntity(ownerUser))
+                .build();
+    }
+
+
 
 }

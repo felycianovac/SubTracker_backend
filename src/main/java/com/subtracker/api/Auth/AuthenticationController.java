@@ -40,5 +40,11 @@ public class AuthenticationController {
                                       HttpServletResponse response) {
         return authenticationService.switchContext(currentUser, request, response);
     }
+    @PostMapping("/revert-context")
+    public AuthResponse revertContext(@AuthenticationPrincipal Users currentUser,
+                                      HttpServletResponse response) {
+        return authenticationService.revertContext(currentUser, response);
+    }
+
 
 }
