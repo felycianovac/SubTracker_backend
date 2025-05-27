@@ -1,6 +1,6 @@
-package Subscription;
+package com.subtracker.api.Subscription;
 
-import User.User;
+import com.subtracker.api.User.Users;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -66,5 +66,5 @@ public class Subscription {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Users users;
 }
