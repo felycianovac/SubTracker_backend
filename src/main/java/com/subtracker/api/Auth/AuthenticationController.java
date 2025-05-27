@@ -26,4 +26,9 @@ public class AuthenticationController {
                               HttpServletResponse response) {
         return authenticationService.login(request, response);
     }
+
+    @PostMapping("/logout")
+    public AuthResponse logout(HttpServletResponse response) {
+        return authenticationService.logout(response);
+    }
 }

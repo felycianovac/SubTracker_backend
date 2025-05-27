@@ -71,6 +71,20 @@ public class AuthenticationService {
                 UserDTO.fromEntity(user));
     }
 
+    public AuthResponse logout(HttpServletResponse response) {
+        ResponseCookie tokenCookie = ResponseCookie.from("auth_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, tokenCookie.toString());
+
+        return AuthResponse.builder()
+                .message("Logout successful")
+                .build();
+    }
+
     private void setJwtTokenInCookie(HttpServletResponse response, String jwtToken) {
         ResponseCookie tokenCookie = ResponseCookie.from("auth_token", jwtToken)
                 .httpOnly(true)
