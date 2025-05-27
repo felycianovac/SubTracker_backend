@@ -55,6 +55,7 @@ public class SecurityConfiguration {
 //                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("api/auth/*").permitAll() //default to allow all requests to api/*
+                        .requestMatchers("api/permissions/*").permitAll()
                         .anyRequest().authenticated())
 
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

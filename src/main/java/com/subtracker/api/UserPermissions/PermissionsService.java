@@ -6,6 +6,7 @@ import com.subtracker.api.User.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -74,5 +75,57 @@ public class PermissionsService {
         return "Guest permission updated successfully.";
     }
 
+    public String removePermission(Users currentUser, String guestEmail) {
+        if (currentUser.getRole() != Role.OWNER) {
+            throw new IllegalArgumentException("Only OWNERs can remove guest access.");
+        }
+
+        Optional<Users> guestOpt = usersRepository.findByEmail(guestEmail);
+        if (guestOpt.isEmpty()) {
+            throw new IllegalArgumentException("Guest user not found.");
+        }
+
+        Users guest = guestOpt.get();
+
+        Optional<UserPermissions> permissionOpt = userPermissionsRepository
+                .findByGuestUserIdAndOwnerUserId(guest.getUserId(), currentUser.getUserId());
+
+        if (permissionOpt.isEmpty()) {
+            throw new IllegalArgumentException("No permission found for this guest.");
+        }
+
+        userPermissionsRepository.delete(permissionOpt.get());
+        return "Guest permission removed successfully.";
 
     }
+
+    public List<ContextDTO> getAvailableContexts(Users currentUser) {
+        return userPermissionsRepository.findAllByGuestUserId(currentUser.getUserId())
+                .stream()
+                .map(permission -> new ContextDTO(
+                        permission.getOwner().getUserId(),
+                        permission.getOwner().getEmail(),
+                        permission.getPermission().name()
+                ))
+                .toList();
+    }
+
+    public List<GuestDTO> getGuestsWithAccess(Users currentUser) {
+        if (currentUser.getRole() != Role.OWNER) {
+            throw new IllegalArgumentException("Only OWNERs can view guest access.");
+        }
+
+        return userPermissionsRepository.findAll()
+                .stream()
+                .filter(perm -> perm.getOwner().getUserId() == currentUser.getUserId())
+                .map(perm -> new GuestDTO(
+                        perm.getGuest().getUserId(),
+                        perm.getGuest().getEmail(),
+                        perm.getPermission().name()
+                ))
+                .toList();
+    }
+
+
+
+}
