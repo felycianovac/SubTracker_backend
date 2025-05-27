@@ -5,6 +5,8 @@ import com.subtracker.api.User.Role;
 import com.subtracker.api.User.UserDTO;
 import com.subtracker.api.User.Users;
 import com.subtracker.api.User.UsersRepository;
+import com.subtracker.api.UserPermissions.UserPermissions;
+import com.subtracker.api.UserPermissions.UserPermissionsRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +22,7 @@ public class AuthenticationService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserPermissionsRepository userPermissionsRepository;
 
 
     public AuthResponse register(AuthRequest request, HttpServletResponse response) {
@@ -95,5 +98,29 @@ public class AuthenticationService {
 
         response.addHeader(HttpHeaders.SET_COOKIE, tokenCookie.toString());
     }
+
+    public AuthResponse switchContext(Users currentUser, SwitchContextRequest request, HttpServletResponse response) {
+        int guestId = currentUser.getUserId();
+        int ownerId = request.getOwnerId();
+
+        UserPermissions permission = userPermissionsRepository
+                .findByGuestUserIdAndOwnerUserId(guestId, ownerId)
+                .orElseThrow(() -> new IllegalArgumentException("You do not have access to this owner's data."));
+
+        Users contextUser = Users.builder()
+                .userId(currentUser.getUserId())
+                .email(currentUser.getEmail())
+                .role(permission.getPermission())
+                .build();
+
+        String jwt = jwtService.generateToken(contextUser);
+        setJwtTokenInCookie(response, jwt);
+
+        return AuthResponse.builder()
+                .message("Context switched to owner ID: " + ownerId)
+                .user(UserDTO.fromEntity(contextUser))
+                .build();
+    }
+
 
 }

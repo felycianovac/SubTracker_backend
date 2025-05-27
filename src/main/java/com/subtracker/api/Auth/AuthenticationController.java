@@ -1,8 +1,10 @@
 package com.subtracker.api.Auth;
 
+import com.subtracker.api.User.Users;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,4 +33,12 @@ public class AuthenticationController {
     public AuthResponse logout(HttpServletResponse response) {
         return authenticationService.logout(response);
     }
+
+    @PostMapping("/switch-context")
+    public AuthResponse switchContext(@AuthenticationPrincipal Users currentUser,
+                                      @RequestBody SwitchContextRequest request,
+                                      HttpServletResponse response) {
+        return authenticationService.switchContext(currentUser, request, response);
+    }
+
 }

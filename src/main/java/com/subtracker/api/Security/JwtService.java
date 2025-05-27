@@ -33,8 +33,7 @@ public class JwtService {
         if (userDetails instanceof Users){
             Users user = (Users) userDetails;
             String userId = String.valueOf(user.getUserId());
-            Map<String, Object> extraClaims = new HashMap<>();
-            extraClaims.put("role", user.getRole().name());
+
             return generateToken(userId, new HashMap<>(), userDetails);
         }
         return null;
@@ -48,6 +47,10 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .claim("id", userId)
+                .claim("role", userDetails.getAuthorities().stream()
+                        .findFirst()
+                        .map(Object::toString)
+                        .orElse("USER"))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 //expiration time 1 minute
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
