@@ -32,29 +32,29 @@ public class SecurityConfiguration {
     private  AuthenticationProvider authenticationProvider;
 
 
-    @Bean
-    public static PasswordEncoder myPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    public static PasswordEncoder myPasswordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 
-
-    @Bean
-    public InMemoryUserDetailsManager userDetailsManager(){
-        UserDetails user = User.withUsername("user")
-                .password(myPasswordEncoder().encode("password"))
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(user);
-    }
+//
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsManager(){
+//        UserDetails user = User.withUsername("user")
+//                .password(myPasswordEncoder().encode("password"))
+//                .roles("USER")
+//                .build();
+//        return new InMemoryUserDetailsManager(user);
+//    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable() //temporarily disable CORS for testing
                 )
 
-                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+//                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("api/*").permitAll() //default to allow all requests to api/*
+                        .requestMatchers("api/auth/*").permitAll() //default to allow all requests to api/*
                         .anyRequest().authenticated())
 
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

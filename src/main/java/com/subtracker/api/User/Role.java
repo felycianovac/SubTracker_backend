@@ -1,6 +1,7 @@
 package com.subtracker.api.User;
 
 public enum Role {
-    USER,
-    READER
+    OWNER,
+    GUEST_RO,
+    GUEST_RW,
 }

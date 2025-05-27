@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Claims;
@@ -17,7 +18,9 @@ import com.subtracker.api.User.Users;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "";
+    @Value("${JWT_SECRET_KEY}")
+    private String secretKey;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -30,6 +33,8 @@ public class JwtService {
         if (userDetails instanceof Users){
             Users user = (Users) userDetails;
             String userId = String.valueOf(user.getUserId());
+            Map<String, Object> extraClaims = new HashMap<>();
+            extraClaims.put("role", user.getRole().name());
             return generateToken(userId, new HashMap<>(), userDetails);
         }
         return null;
@@ -68,7 +73,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
