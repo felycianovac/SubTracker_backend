@@ -1,5 +1,6 @@
 package com.subtracker.api.Auth;
 
+import com.subtracker.api.User.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +10,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class AuthResponse {
+    private String message;
+    private UserDTO user;
 
-    private String email;
-    private String password;
 }
+

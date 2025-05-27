@@ -16,4 +16,12 @@ public class UserDTO {
     private String email;
     private String role;
 
+    public static UserDTO fromEntity(Users user){
+        return UserDTO.builder()
+                .id(user.getUserId())
+                .email(user.getEmail())
+                .role(user.getRole().name().toString())
+                .build();
+    }
+
 }

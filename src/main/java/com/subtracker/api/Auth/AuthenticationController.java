@@ -1,6 +1,5 @@
 package com.subtracker.api.Auth;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,14 @@ public class AuthenticationController {
     private AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public RegisterResponse register(@RequestBody RegisterRequest request,
-                                     HttpServletResponse response) {
+    public AuthResponse register(@RequestBody AuthRequest request,
+                                 HttpServletResponse response) {
         return authenticationService.register(request, response);
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody AuthRequest request,
+                              HttpServletResponse response) {
+        return authenticationService.login(request, response);
     }
 }
