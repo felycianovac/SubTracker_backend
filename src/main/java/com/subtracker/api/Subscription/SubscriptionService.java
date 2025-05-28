@@ -29,12 +29,15 @@ public class SubscriptionService {
         throw new SecurityException("Insufficient permission for this context");
     }
 
-    public List<Subscription> getSubscriptions(Users currentUser, int contextUserId) {
+    public List<SubscriptionDTO> getSubscriptions(Users currentUser, int contextUserId) {
         Users contextUser = resolveContextUser(currentUser, contextUserId);
-        return subscriptionRepository.findAllByUsers(contextUser);
+        return subscriptionRepository.findAllByUsers(contextUser)
+                .stream()
+                .map(SubscriptionDTO::fromEntity)
+                .toList();
     }
 
-    public Subscription create(Users currentUser, int contextUserId, Subscription sub) {
+    public SubscriptionDTO create(Users currentUser, int contextUserId, Subscription sub) {
         Users contextUser = resolveContextUser(currentUser, contextUserId);
 
         if (currentUser.getUserId() != contextUserId &&
@@ -43,10 +46,11 @@ public class SubscriptionService {
         }
 
         sub.setUsers(contextUser);
-        return subscriptionRepository.save(sub);
+        subscriptionRepository.save(sub);
+        return SubscriptionDTO.fromEntity(sub);
     }
 
-    public Subscription update(Users currentUser, int contextUserId, Subscription updated) {
+    public SubscriptionDTO update(Users currentUser, int contextUserId, Subscription updated) {
         Subscription existing = subscriptionRepository.findById(updated.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
 
@@ -60,7 +64,8 @@ public class SubscriptionService {
         }
 
         updated.setUsers(existing.getUsers());
-        return subscriptionRepository.save(updated);
+        subscriptionRepository.save(updated);
+        return SubscriptionDTO.fromEntity(updated);
     }
 
     public void delete(Users currentUser, int contextUserId, Long id) {
@@ -85,7 +90,7 @@ public class SubscriptionService {
                 .orElse(false);
     }
 
-    public Subscription getById(Users currentUser, int contextUserId, Long id) {
+    public SubscriptionDTO getById(Users currentUser, int contextUserId, Long id) {
         Subscription subscription = subscriptionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
 
@@ -93,6 +98,6 @@ public class SubscriptionService {
             throw new SecurityException("Subscription does not belong to specified context");
         }
 
-        return subscription;
+        return SubscriptionDTO.fromEntity(subscription);
     }
 }
