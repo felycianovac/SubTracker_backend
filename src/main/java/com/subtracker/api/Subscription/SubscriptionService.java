@@ -91,6 +91,11 @@ public class SubscriptionService {
     }
 
     public SubscriptionDTO getById(Users currentUser, int contextUserId, Long id) {
+        Users contextUser = resolveContextUser(currentUser, contextUserId);
+        if (currentUser.getUserId() != contextUserId &&
+                !hasReadPermission(currentUser, contextUserId)) {
+            throw new SecurityException("Read access denied");
+        }
         Subscription subscription = subscriptionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
 
@@ -99,5 +104,12 @@ public class SubscriptionService {
         }
 
         return SubscriptionDTO.fromEntity(subscription);
+    }
+
+
+    private boolean hasReadPermission(Users guest, int ownerId) {
+        return permissionsRepository.findByGuestUserIdAndOwnerUserId(guest.getUserId(), ownerId)
+                .map(p -> p.getPermission() == Role.GUEST_RO || p.getPermission() == Role.GUEST_RW)
+                .orElse(false);
     }
 }
