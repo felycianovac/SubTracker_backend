@@ -16,20 +16,20 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @GetMapping
-    public ResponseEntity<List<Subscription>> getAll(@AuthenticationPrincipal Users user,
+    public ResponseEntity<List<SubscriptionDTO>> getAll(@AuthenticationPrincipal Users user,
                                                      @RequestParam int contextUserId) {
         return ResponseEntity.ok(subscriptionService.getSubscriptions(user, contextUserId));
     }
 
     @PostMapping
-    public ResponseEntity<Subscription> create(@AuthenticationPrincipal Users user,
+    public ResponseEntity<SubscriptionDTO> create(@AuthenticationPrincipal Users user,
                                                @RequestParam int contextUserId,
                                                @RequestBody Subscription sub) {
         return ResponseEntity.ok(subscriptionService.create(user, contextUserId, sub));
     }
 
     @PutMapping
-    public ResponseEntity<Subscription> update(@AuthenticationPrincipal Users user,
+    public ResponseEntity<SubscriptionDTO> update(@AuthenticationPrincipal Users user,
                                                @RequestParam int contextUserId,
                                                @RequestBody Subscription sub) {
         return ResponseEntity.ok(subscriptionService.update(user, contextUserId, sub));
@@ -44,7 +44,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Subscription> getById(@AuthenticationPrincipal Users user,
+    public ResponseEntity<SubscriptionDTO> getById(@AuthenticationPrincipal Users user,
                                                 @RequestParam int contextUserId,
                                                 @PathVariable Long id) {
         return ResponseEntity.ok(subscriptionService.getById(user, contextUserId, id));

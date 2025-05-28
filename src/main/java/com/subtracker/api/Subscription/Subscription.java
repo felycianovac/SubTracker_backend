@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.concurrent.TimeUnit;
 
 @Entity
 @Table(name = "subscription")
@@ -37,7 +36,7 @@ public class Subscription {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TimeUnit billingUnit;
+    private BillingUnit billingUnit;
 
     @Column(nullable = false)
     private boolean automaticallyRenews;
