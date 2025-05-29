@@ -18,9 +18,7 @@ public class PermissionsService {
 
 
     public String addPermission(Users currentUser, PermissionRequest request) {
-        if (currentUser.getRole() != Role.OWNER) {
-            throw new IllegalArgumentException("Only OWNERs can grant guest access.");
-        }
+
 
         Optional<Users> guestOpt = usersRepository.findByEmail(request.getGuestEmail());
         if (guestOpt.isEmpty()) {
@@ -51,9 +49,7 @@ public class PermissionsService {
     }
 
     public String updatePermission(Users currentUser, PermissionRequest request) {
-        if (currentUser.getRole() != Role.OWNER) {
-            throw new IllegalArgumentException("Only OWNERs can update permissions.");
-        }
+
         Optional<Users> guestOpt = usersRepository.findByEmail(request.getGuestEmail());
         if (guestOpt.isEmpty()) {
             throw new IllegalArgumentException("Guest user not found.");
@@ -111,9 +107,6 @@ public class PermissionsService {
     }
 
     public List<GuestDTO> getGuestsWithAccess(Users currentUser) {
-        if (currentUser.getRole() != Role.OWNER) {
-            throw new IllegalArgumentException("Only OWNERs can view guest access.");
-        }
 
         return userPermissionsRepository.findAll()
                 .stream()

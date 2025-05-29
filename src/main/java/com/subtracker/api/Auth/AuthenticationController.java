@@ -1,18 +1,17 @@
 package com.subtracker.api.Auth;
 
+import com.subtracker.api.User.UserDTO;
 import com.subtracker.api.User.Users;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @AllArgsConstructor
+@CrossOrigin
 public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
@@ -35,7 +34,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/switch-context")
-    public AuthResponse switchContext(@AuthenticationPrincipal Users currentUser,
+    public ContextDTO switchContext(@AuthenticationPrincipal Users currentUser,
                                       @RequestBody SwitchContextRequest request,
                                       HttpServletResponse response) {
         return authenticationService.switchContext(currentUser, request, response);
@@ -44,6 +43,11 @@ public class AuthenticationController {
     public AuthResponse revertContext(@AuthenticationPrincipal Users currentUser,
                                       HttpServletResponse response) {
         return authenticationService.revertContext(currentUser, response);
+    }
+
+    @GetMapping("/current")
+    public UserDTO getCurrentUser(@AuthenticationPrincipal Users currentUser) {
+        return authenticationService.getCurrentUser(currentUser);
     }
 
 
