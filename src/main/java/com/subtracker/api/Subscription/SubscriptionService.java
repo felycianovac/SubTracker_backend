@@ -5,6 +5,8 @@ import com.subtracker.api.User.Users;
 import com.subtracker.api.UserPermissions.UserPermissions;
 import com.subtracker.api.UserPermissions.UserPermissionsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,12 +31,12 @@ public class SubscriptionService {
         throw new SecurityException("Insufficient permission for this context");
     }
 
-    public List<SubscriptionDTO> getSubscriptions(Users currentUser, int contextUserId) {
+    public Page<SubscriptionDTO> getSubscriptions(Users currentUser, int contextUserId, int page, int size) {
         Users contextUser = resolveContextUser(currentUser, contextUserId);
-        return subscriptionRepository.findAllByUsers(contextUser)
-                .stream()
-                .map(SubscriptionDTO::fromEntity)
-                .toList();
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Subscription> subsPage = subscriptionRepository.findAllByUsers(contextUser, pageRequest);
+        return subsPage.map(SubscriptionDTO::fromEntity);
     }
 
     public SubscriptionDTO create(Users currentUser, int contextUserId, Subscription sub) {
