@@ -7,6 +7,7 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -49,13 +50,27 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable() //temporarily disable CORS for testing
-                )
-
+                //enable CORS support
 //                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("api/auth/*").permitAll() //default to allow all requests to api/*
-                        .requestMatchers("api/permissions/*").permitAll()
+                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/logout").authenticated()
+                        .requestMatchers("/api/auth/current").authenticated()
+                        .requestMatchers("/api/permissions/add").authenticated()
+                        .requestMatchers("/api/permissions/update").authenticated()
+                        .requestMatchers("/api/permissions/delete").authenticated()
+                        .requestMatchers("/api/permissions/contexts").authenticated()
+                        .requestMatchers("/api/permissions/guests").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/subscriptions").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/subscriptions").hasAnyAuthority("OWNER", "GUEST_RW")
+                        .requestMatchers(HttpMethod.PUT, "/api/subscriptions").hasAnyAuthority("OWNER", "GUEST_RW")
+                        .requestMatchers(HttpMethod.DELETE, "/api/subscriptions/**").hasAnyAuthority("OWNER", "GUEST_RW")
+                        .requestMatchers(HttpMethod.GET, "/api/subscriptions/**").authenticated()
+
+                        .requestMatchers("/api-docs").permitAll()
+                        .requestMatchers("/swagger-ui/*").permitAll()
+                        .requestMatchers("/api/subscriptions/**").permitAll()
                         .anyRequest().authenticated())
 
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

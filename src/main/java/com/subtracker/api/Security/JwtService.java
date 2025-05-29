@@ -53,7 +53,7 @@ public class JwtService {
                         .orElse("USER"))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 //expiration time 1 minute
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 ))
                 .signWith(SignatureAlgorithm.HS256, getSignInKey()).compact();
 
     }
