@@ -99,13 +99,24 @@ public class AuthenticationService {
         response.addHeader(HttpHeaders.SET_COOKIE, tokenCookie.toString());
     }
 
-    public AuthResponse switchContext(Users currentUser, SwitchContextRequest request, HttpServletResponse response) {
+    public ContextDTO switchContext(Users currentUser, SwitchContextRequest request, HttpServletResponse response) {
         int guestId = currentUser.getUserId();
         int ownerId = request.getOwnerId();
 
         UserPermissions permission = userPermissionsRepository
                 .findByGuestUserIdAndOwnerUserId(guestId, ownerId)
                 .orElseThrow(() -> new IllegalArgumentException("You do not have access to this owner's data."));
+
+        usersRepository.findById(guestId).ifPresentOrElse(
+                existingUser -> {
+                    existingUser.setRole(permission.getPermission());
+                    usersRepository.save(existingUser);
+                },
+                () -> {
+                    throw new IllegalArgumentException("Current user not found");
+                }
+        );
+
 
         Users contextUser = Users.builder()
                 .userId(currentUser.getUserId())
@@ -116,10 +127,12 @@ public class AuthenticationService {
         String jwt = jwtService.generateToken(contextUser);
         setJwtTokenInCookie(response, jwt);
 
-        return AuthResponse.builder()
-                .message("Context switched to owner ID: " + ownerId)
+        AuthResponse authResponse = AuthResponse.builder()
+                .message("Switched to context of owner with ID: " + ownerId)
                 .user(UserDTO.fromEntity(contextUser))
                 .build();
+
+        return new ContextDTO(authResponse, ownerId);
     }
 
     public AuthResponse revertContext(Users currentUser, HttpServletResponse response) {
@@ -128,6 +141,16 @@ public class AuthenticationService {
                 .email(currentUser.getEmail())
                 .role(Role.OWNER)
                 .build();
+
+        usersRepository.findById(currentUser.getUserId()).ifPresentOrElse(
+                existingUser -> {
+                    existingUser.setRole(Role.OWNER);
+                    usersRepository.save(existingUser);
+                },
+                () -> {
+                    throw new IllegalArgumentException("Current user not found");
+                }
+        );
 
         String jwt = jwtService.generateToken(ownerUser);
         setJwtTokenInCookie(response, jwt);
@@ -139,5 +162,7 @@ public class AuthenticationService {
     }
 
 
-
+    public UserDTO getCurrentUser(Users currentUser) {
+        return UserDTO.fromEntity(currentUser);
+    }
 }
