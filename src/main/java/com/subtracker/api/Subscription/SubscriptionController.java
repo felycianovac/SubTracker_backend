@@ -2,6 +2,7 @@ package com.subtracker.api.Subscription;
 
 import com.subtracker.api.User.Users;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,9 +19,12 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @GetMapping
-    public ResponseEntity<List<SubscriptionDTO>> getAll(@AuthenticationPrincipal Users user,
-                                                        @RequestParam int contextUserId) {
-        return ResponseEntity.ok(subscriptionService.getSubscriptions(user, contextUserId));
+
+    public ResponseEntity<Page<SubscriptionDTO>> getAll(@AuthenticationPrincipal Users user,
+                                                        @RequestParam int contextUserId,
+                                                        @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(subscriptionService.getSubscriptions(user, contextUserId, page, size));
     }
 
     @PreAuthorize("hasAnyAuthority('OWNER', 'GUEST_RW')")
