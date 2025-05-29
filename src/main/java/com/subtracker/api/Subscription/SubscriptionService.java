@@ -86,7 +86,7 @@ public class SubscriptionService {
 
     private boolean hasWritePermission(Users guest, int ownerId) {
         return permissionsRepository.findByGuestUserIdAndOwnerUserId(guest.getUserId(), ownerId)
-                .map(p -> p.getPermission() == Role.GUEST_RW)
+                .map(p -> p.getPermission() == Role.GUEST_RW || p.getPermission() == Role.OWNER)
                 .orElse(false);
     }
 
